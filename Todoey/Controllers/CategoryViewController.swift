@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 class CategoryViewController: SwipeTabelViewController {
     
@@ -19,6 +20,7 @@ class CategoryViewController: SwipeTabelViewController {
         super.viewDidLoad()
 
         loadCategories()
+        tableView.separatorStyle = .none
     }
     
     //MARK: - TableView Datasource Methods
@@ -29,7 +31,16 @@ class CategoryViewController: SwipeTabelViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "No categories added yet"
+        
+        if let category = categories?[indexPath.row] {
+
+            cell.textLabel?.text = category.name
+            
+            guard let categoryColour = UIColor(hexString: category.colour) else {fatalError()}
+            
+            cell.backgroundColor = categoryColour
+            cell.textLabel?.textColor = ContrastColorOf(categoryColour, returnFlat: true)
+        }
         
         return cell
     }
@@ -94,7 +105,7 @@ class CategoryViewController: SwipeTabelViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
-            
+            newCategory.colour = UIColor.randomFlat.hexValue()
             // no need to append data when using realm as it's appending data auto "use this when it's coredata"
 //            self.categories.append(newCategory)
             
